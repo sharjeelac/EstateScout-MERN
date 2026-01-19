@@ -18,5 +18,7 @@ export const verifyToken = (req, res, next) => {
       req.user = decoded;
       next();
     });
-  } catch (error) {}
+  } catch (error) { }
 };
+
+export default verifyToken

@@ -16,17 +16,22 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     phone: {
-        type: String,
-        required: false,   
+      type: String,
+      required: false,
     },
     profilePicture: {
       type: String,
       required: false,
     },
-    posts : {
-        type: [mongoose.Schema.Types.ObjectId],
-        ref: "Post",
-        default: []
+    posts: {
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Post",
+      default: []
+    },
+    role: {
+      type: String,
+      enum: ["user", "agent", "admin"],
+      default: "user"
     }
   },
   { timestamps: true }

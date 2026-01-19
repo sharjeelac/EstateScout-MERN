@@ -23,9 +23,6 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-// user routes
-import userRoutes from './routes/user.routes.js';
-app.use('/api/users', userRoutes);
 
 // auth routes
 import authRoutes from './routes/auth.routes.js';

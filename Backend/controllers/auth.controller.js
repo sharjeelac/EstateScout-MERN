@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import { generateRefreshToken , generateAccessToken} from "../utils/token.js";
+import { generateRefreshToken, generateAccessToken } from "../utils/token.js";
 
 dotenv.config();
 
@@ -11,7 +11,8 @@ dotenv.config();
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email }).populate("posts");
+
     const matchPassowrd = await bcrypt.compare(password, user.password);
 
     if (!user || !matchPassowrd) {
@@ -37,7 +38,7 @@ export const login = async (req, res) => {
 // User Registration controller (register)
 export const register = async (req, res) => {
   try {
-    const { name, email, password, phone, profilePicture } = req.body;
+    const { name, email, password, phone, profilePicture, role } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
@@ -49,6 +50,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
       phone,
       profilePicture,
+      role,
     });
     await newUser.save();
 
@@ -82,23 +84,69 @@ export const logout = async (req, res) => {
   }
 };
 
-
 // Refesh token controller (token rotation)
-export const refreshToken = async(req, res)=>{
-    try {
-        const refreshToken = req.cookies.refreshToken;
-        if (!refreshToken) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            if (err) {
-                return res.status(403).json({ message: "Forbidden" });
-            }
-            const newAccessToken = generateAccessToken(decoded);
-            res.status(200).json({ token: newAccessToken });
-        });
-    } catch (error) {
-        console.error("Error refreshing token:", error);
-        res.status(500).json({ message: "Server error" });
+export const refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      const newAccessToken = generateAccessToken(decoded);
+      res.status(200).json({ token: newAccessToken });
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Get user profile by ID
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).populate("posts");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Update user profile
+export const updateUserProfile = async (req, res) => {
+  try {
+    const { name, phone, profilePicture } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.profilePicture = profilePicture || user.profilePicture;
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// Delete user by ID
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 }
