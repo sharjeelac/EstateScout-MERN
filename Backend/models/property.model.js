@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const postSchema = new mongoose.Schema(
+const propertySchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -39,7 +39,7 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    owner: {
+    agent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -49,5 +49,5 @@ const postSchema = new mongoose.Schema(
 );
 
 
-const Post = mongoose.model("Post", postSchema);
-export default Post;
+const Property = mongoose.model("Property", propertySchema);
+export default Property;
