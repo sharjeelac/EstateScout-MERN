@@ -29,8 +29,8 @@ import authRoutes from './routes/auth.routes.js';
 app.use('/api/auth', authRoutes);
 
 // post routes
-import postRoutes from './routes/post.routes.js';
-app.use('/api/posts', postRoutes);
+import propertyRoutes from './routes/property.routes.js';
+app.use('/api/properties', propertyRoutes);
 
 const PORT = process.env.PORT || 5000;
 
