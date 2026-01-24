@@ -11,7 +11,7 @@ dotenv.config();
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email }).populate("posts");
+    const user = await User.findOne({ email }).populate("properties");
 
     const matchPassowrd = await bcrypt.compare(password, user.password);
 

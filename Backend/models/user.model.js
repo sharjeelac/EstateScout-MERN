@@ -23,9 +23,9 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    posts: {
+    properties: {
       type: [mongoose.Schema.Types.ObjectId],
-      ref: "Post",
+      ref: "Property",
       default: []
     },
     role: {

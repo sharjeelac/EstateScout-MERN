@@ -12,12 +12,14 @@ const Signup = () => {
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [role, setRole] = useState('buyer')
 
     const handleSignup = async (e) => {
         e.preventDefault()
         try {
-            const response = await axios.post(`${api}/auth/register`, { name, email, password })
+            const response = await axios.post(`${api}/auth/register`, { name, email, password, role })
             console.log(response.data);
+            localStorage.setItem('token', response.data.token)
             navigate('/home');
         } catch (error) {
             console.log("Signup Error:", error.response.data);
@@ -37,6 +39,12 @@ const Signup = () => {
                     <br />
                     <label htmlFor="">Password</label>
                     <input type="password" placeholder='Enter your password' value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <br />
+                    <label htmlFor="">Role</label>
+                    <select value={role} onChange={(e) => setRole(e.target.value)} required>
+                        <option value="user">Buyer</option>
+                        <option value="agent">Agent</option>
+                    </select>
                     <br />
                     <button type='submit'>Signup</button>
                 </form>
